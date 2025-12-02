@@ -1,4 +1,4 @@
-package activities;
+package activities1;
 
 public class Car {
 	String color;
@@ -13,12 +13,12 @@ public class Car {
 	}
 
 	public void displayCharacteristics() {
-		System.out.println(color);
-		System.out.println(transmission);
-		System.out.println(make);
-		System.out.println(tyres);
-		System.out.println(doors);
-		
+			System.out.println("Color of the Car: " + color);
+			System.out.println("Make of the Car: " + make);
+			System.out.println("Transmission of the Car: " + transmission);
+			System.out.println("Number of doors on the car: " + doors);
+		    System.out.println("Number of tyres on the car: " + tyres);
+		    
 	}
 	
 	public void accelarate() {
