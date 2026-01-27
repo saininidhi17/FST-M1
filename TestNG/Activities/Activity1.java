@@ -1,56 +1,39 @@
-package activities;
+package TestNg;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
-import java.util.HashMap;
-import java.util.Map;
+ import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver; 
+import org.openqa.selenium.firefox.FirefoxDriver; 
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import io.restassured.response.Response;
 
 public class Activity1 {
-	@Test(priority = 1)
-	public void addNewPet() {
-		Map<String, Object> reqBody = new HashMap<>();
-		reqBody.put("id", 77232);
-		reqBody.put("name", "Riley");
-		reqBody.put("status", "alive");
-
-		Response response = given()
-			.baseUri("https://petstore.swagger.io/v2/pet")  
-			.header("Content-Type", "application/json") // Set headers
-			.body(reqBody) // Add request body
-			.when().post(); // Send POST request
-
-		// Assertion
-		response.then().body("id", equalTo(77232));
-		response.then().body("name", equalTo("Riley"));
-		response.then().body("status", equalTo("alive"));
-	}
-
-	@Test(priority = 2)
-	public void getPetInfo() {
-		Response response = given()
-			.baseUri("https://petstore.swagger.io/v2/pet") // Set base URI
-			.header("Content-Type", "application/json") // Set headers
-			.when().pathParam("petId", 77232) // Set path parameter
-			.get("/{petId}"); // Send GET request
-
-		// Assertion
-		response.then().body("id", equalTo(77232));
-		response.then().body("name", equalTo("Riley"));
-		response.then().body("status", equalTo("alive"));
-	}
-
-	@Test(priority = 3)
-	public void deletePet() {
-		Response response = given()
-			.baseUri("https://petstore.swagger.io/v2/pet") // Set base URI
-			.header("Content-Type", "application/json") // Set headers
-			.when().pathParam("petId", 77232) // Set path parameter
-			.delete("/{petId}"); // Send DELETE request
-
-		// Assertion
-		response.then().body("code", equalTo(200));
-		response.then().body("message", equalTo("77232"));
-	}
+    WebDriver driver;
+    
+    @BeforeClass
+    public void setUp() {
+        driver = new FirefoxDriver();
+        driver.get("https://training-support.net");
+    }
+    
+    @Test(priority = 1)
+    public void homePageTest() {
+        Assert.assertEquals(driver.getTitle(), "Training Support");
+        
+        // Find and click the About page link
+        driver.findElement(By.linkText("About Us")).click();
+    }
+    
+    @Test(priority = 2)
+    public void aboutPageTest() {
+    	Assert.assertEquals(driver.getTitle(), "About Training Support");
+    }
+    
+    // Teardown function
+    @AfterClass
+    public void tearDown() {
+        // Close the browser
+        driver.quit();
+    }
 }
