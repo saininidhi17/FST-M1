@@ -3,8 +3,9 @@
 <suite name="ExampleSuite" >
     <test name="SuiteTests" >
         <classes>
-            <class name="suiteExample.DemoOne"/>
-            <class name="suiteExample.DemoTwo"/>
+            <class name="TestNg.DemoOne"/>
+            <class name="TestNg.DemoTwo"/>
         </classes>
     </test>
+
 </suite>
