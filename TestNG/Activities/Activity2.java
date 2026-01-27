@@ -1,78 +1,59 @@
-package activities;
+package TestNg;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import io.restassured.response.Response;
 
 public class Activity2 {
-	@Test(priority=1)
-	public void addNewUserFromFile() throws IOException {
-		// Import JSON file
-		FileInputStream inputJSON = new FileInputStream("src/main/resources/userInfo.json");   
+    WebDriver driver;
 
-		Response response = given()
-			.baseUri("https://petstore.swagger.io/v2/user") // Set base URI
-			.header("Content-Type", "application/json") // Set headers
-			.body(inputJSON) // Pass request body from file
-			.when().post(); // Send POST request
+    @BeforeTest
+    public void beforeMethod() {
+        // Create a new instance of the Firefox driver
+        driver = new FirefoxDriver();
 
-		inputJSON.close();
+        // Open the browser
+        driver.get("https://training-support.net/webelements/target-practice");
+    }
 
-		// Assertion
-		response.then().body("code", equalTo(200));
-		response.then().body("message", equalTo("9901"));
-	}
-	
-	@Test(priority=2)
-	public void getUserInfo() {
-		// Import JSON file to write to
-		File outputJSON = new File("src/test/java/activities/userGETResponse.json");
+    @Test
+    public void testCase1() {
+        // This test case will pass
+        String title = driver.getTitle();
+        System.out.println("Title is: " + title);
+        Assert.assertEquals(title, "Selenium: Target Practice");
+    }
 
-		Response response = given()
-			.baseUri("https://petstore.swagger.io/v2/user") // Set base URI
-			.header("Content-Type", "application/json") // Set headers
-			.pathParam("username", "justinc") // Pass request body from file
-			.when().get("/{username}"); // Send POST request
-		
-		// Get response body
-		String resBody = response.getBody().asPrettyString();
+    @Test
+    public void testCase2() {
+        // This test case will Fail
+        WebElement blackButton = driver.findElement(By.cssSelector("button.black"));
+        Assert.assertTrue(blackButton.isDisplayed());
+        Assert.assertEquals(blackButton.getText(), "black");
+    }
 
-		try {
-			// Create JSON file
-			outputJSON.createNewFile();
-			// Write response body to external file
-			FileWriter writer = new FileWriter(outputJSON.getPath());
-			writer.write(resBody);
-			writer.close();
-		} catch (IOException excp) {
-			excp.printStackTrace();
-		}
-		
-		// Assertion
-		response.then().body("id", equalTo(9901));
-		response.then().body("username", equalTo("justinc"));
-		response.then().body("firstName", equalTo("Justin"));
-		response.then().body("lastName", equalTo("Case"));
-		response.then().body("email", equalTo("justincase@mail.com"));
-		response.then().body("password", equalTo("password123"));
-		response.then().body("phone", equalTo("9812763450"));
-	}
-	
-	@Test(priority=3)
-	public void deleteUser() throws IOException {
-		Response response = given()
-			.baseUri("https://petstore.swagger.io/v2/user") // Set base URI
-			.header("Content-Type", "application/json") // Set headers
-			.pathParam("username", "justinc") // Add path parameter
-			.when().delete("/{username}"); // Send POST request
+    @Test(enabled = false)
+    public void testCase3() {
+        // This test will be skipped and not counted
+        String subHeading = driver.findElement(By.className("sub")).getText();
+        Assert.assertTrue(subHeading.contains("Practice"));
+    }
 
-		// Assertion
-		response.then().body("code", equalTo(200));
-		response.then().body("message", equalTo("justinc"));
-	}
+    @Test
+    public void testCase4() {
+        // This test will be skipped and will be be shown as skipped
+        throw new SkipException("Skipping test case");
+    }
+
+    @AfterTest
+    public void afterMethod() {
+        // Close the browser
+        driver.close();
+    }
 }
