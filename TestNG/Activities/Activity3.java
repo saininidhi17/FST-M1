@@ -1,93 +1,54 @@
-package activities;
+package TestNg;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
-import java.util.HashMap;
-import java.util.Map;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
 
 public class Activity3 {
-	// Declare request specification
-	RequestSpecification requestSpec;
-	// Declare response specification
-	ResponseSpecification responseSpec;
+    WebDriver driver;
 
-	@BeforeClass
-	public void setUp() {
-		// Create request specification
-		requestSpec = new RequestSpecBuilder()
-			// Set content type
-			.addHeader("Content-Type", "application/json")
-			// Set base URL
-			.setBaseUri("https://petstore.swagger.io/v2/pet")
-			// Build request specification
-			.build();
+    @BeforeClass
+    public void beforeClass() {
+        driver = new FirefoxDriver();
 
-		responseSpec = new ResponseSpecBuilder()
-			// Check status code in response
-			.expectStatusCode(200)
-			// Check response content type
-			.expectContentType("application/json")
-			// Check if response contains name property
-			.expectBody("status", equalTo("alive"))
-			// Build response specification
-			.build();
-	}
+        // Open browser
+        driver.get("https://training-support.net/webelements/login-form");
+    }
 
-	@DataProvider(name = "petInfo")
-	public Object[][] petInfoProvider() {
-		// Setting parameters to pass to test case
-		Object[][] testData = new Object[][] { 
-			{ 77232, "Riley", "alive" }, 
-			{ 77233, "Hansel", "alive" } 
-		};
-		return testData;
-	}
+    @Test
+    public void loginTest() {
+        // Find the username and password fields
+        WebElement username = driver.findElement(By.id("username"));
+        WebElement password = driver.findElement(By.id("password"));
 
-	@Test(priority=1, dataProvider = "petInfo")
-	// Test case using a DataProvider
-	public void addPets(int petId, String petName, String petStatus) {
-		Map<String, Object> reqBody = new HashMap<>();
-		reqBody.put("id", petId);
-		reqBody.put("name", petName);
-		reqBody.put("status", petStatus);
-		
-		given().spec(requestSpec) // Use requestSpec
-			.body(reqBody) // Send request body
-		.when()
-			.post() // Send POST request
-		.then().spec(responseSpec) // Assertions using responseSpec
-		.body("name", equalTo(petName)); // Additional Assertion
-	}
+        // Enter credentials
+        username.sendKeys("admin");
+        password.sendKeys("password");
 
-	// Test case using a DataProvider
-	@Test( priority=2, dataProvider = "petInfo")
-	public void getPets(int petId, String petName, String petStatus) {
-		given().spec(requestSpec) // Use requestSpec
-			.pathParam("petId", petId) // Add path parameter
-			.log().all() // Log for request details
-		.when()
-			.get("/{petId}") // Send GET request
-		.then().spec(responseSpec) // Assertions using responseSpec
-		    .body("name", equalTo(petName)) // Additional Assertion
-		    .log().all(); // Log for request details
-	}
+        // Click login
+        driver.findElement(By.xpath("//button[text()='Submit']")).click();
 
-	// Test case using a DataProvider
-	@Test(priority=3, dataProvider = "petInfo")
-	public void deletePets(int petId, String petName, String petStatus) {
-		given().spec(requestSpec) // Use requestSpec
-			.pathParam("petId", petId) // Add path parameter
-		.when()
-			.delete("/{petId}") // Send GET request
-		.then()
-			.body("code", equalTo(200))
-			.body("message", equalTo(""+petId)); // Assertions using responseSpec
-	}
+        // Read login message
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        Assert.assertTrue(driver.findElement(By.xpath("//h2[text()='Welcome Back, Admin!']")).isDisplayed());
+        String loginMessage = driver.findElement(By.xpath("//h2[text()='Welcome Back, Admin!']")).getText();
+        System.out.println(loginMessage);
+        Assert.assertEquals("Welcome Back, Admin!", loginMessage);
+    }
+
+    @AfterClass
+    public void afterClass() {
+        // Close browser
+        driver.close();
+    }
 }
